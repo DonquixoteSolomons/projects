@@ -1,0 +1,85 @@
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+
+public class Encoder {
+	    private static final String REFERENCE_TABLE = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789()+*,-./";
+
+	    public String encode(String plainText, char offsetChar) {
+	        Map<Character, Character> charMap = createCharMap(offsetChar);
+
+	        StringBuilder encodedText = new StringBuilder();
+	        for (char c : plainText.toCharArray()) {
+	            if (charMap.containsKey(c)) {
+	                encodedText.append(charMap.get(c));
+	            } else {
+	                encodedText.append(c); 
+	            }
+	        }
+	        return encodedText.toString();
+	    }
+
+	    public String decode(String encodedText) {
+	        char offsetChar = encodedText.charAt(0);
+	        Map<Character, Character> charMap = createCharMap(offsetChar);
+
+	        StringBuilder plainText = new StringBuilder();
+	        for (char c : encodedText.toCharArray()) {
+	            if (charMap.containsValue(c)) {
+	                for (Map.Entry<Character, Character> entry : charMap.entrySet()) {
+	                    if (entry.getValue() == c) {
+	                        plainText.append(entry.getKey());
+	                        break;
+	                    }
+	                }
+	            } else {
+	                plainText.append(c); 
+	            }
+	        }
+
+	        return plainText.toString();
+	    }
+
+	    private Map<Character, Character> createCharMap(char offsetChar) {
+	        Map<Character, Character> charMap = new HashMap<>();
+	        int offset = REFERENCE_TABLE.indexOf(offsetChar);
+
+	        for (int i = 0; i < REFERENCE_TABLE.length(); i++) {
+	            char originalChar = REFERENCE_TABLE.charAt(i);
+	            int shiftedIndex = (i - offset + REFERENCE_TABLE.length()) % REFERENCE_TABLE.length();
+	            char shiftedChar = REFERENCE_TABLE.charAt(shiftedIndex);
+	            charMap.put(originalChar, shiftedChar);
+	        }
+
+	        return charMap;
+	    }
+
+	    public static void main(String[] args) {
+	        Encoder encoder = new Encoder();
+	        Scanner scanner = new Scanner(System.in);
+
+
+	        String plainText;
+
+	        while (true) {
+	            System.out.print("Enter plaintext or type 'end' to exit: ");
+	            plainText = scanner.nextLine().toUpperCase(); 
+
+	            if (plainText.equals("END")) {
+	                break; 
+	            }
+
+	            System.out.print("Enter offset character: ");
+	            char offsetChar = scanner.nextLine().toUpperCase().charAt(0); 
+
+	            System.out.println("Plain Text:    " + plainText);
+
+	            String encodedText = encoder.encode(plainText, offsetChar);
+	            System.out.println("Encoded Text: "+ offsetChar + encodedText);
+	        }
+
+	        scanner.close();
+	    }
+	        
+
+}
